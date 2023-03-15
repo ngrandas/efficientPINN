@@ -13,7 +13,7 @@ os.chdir(r"/home/externo/Documents/nico/efficientPINN/pythontesis/v9/RESULTADOS/
 device = "cuda" # Esta linea hace que el cuaderno se ejecute con la gpu de envidia
 dtype = torch.float64 # Esta linea hace que el tipo de dato sean floats de 64 bits
 plt.ioff()
-
+f =1.5
 class NeuralNetworkPrueba(nn.Module): # Acá se declara el tipo de red que se va a usar
     def __init__(self):
         super(NeuralNetworkPrueba, self).__init__()
@@ -74,7 +74,7 @@ def perdidaParaRevisar():
         for j in puntosPrueba:
             i = torch.tensor([j],device=device)
             y = redDinamica(i)
-            suma += torch.abs(y-torch.sin(j))
+            suma += torch.abs(y-torch.sin(f*1j))
     varPerdidaCondicionParada = suma
     return suma
 
@@ -176,7 +176,7 @@ def perdidaConPesos():
         y = redDinamica(i) 
         yprima=torch.autograd.grad(y,i,create_graph=True)[0]
         yprimaprima=torch.autograd.grad(yprima,i,create_graph=True)[0]
-        suma+=pesos[contador]*(f**2*yprimaprima+y)**2
+        suma+=pesos[contador]*(yprimaprima+f*f*y)**2
         contador +=1
     # Acá se usa alpha = 100
     suma+=100*(redDinamica(x0))**2
@@ -201,7 +201,7 @@ def plottear(filename_):
             import numpy as np
             puntosGrafica = np.linspace(0,10,250)
             plt.plot(puntosGrafica,ygrafica,label = "red")
-            plt.plot(puntosGrafica,np.sin(puntosGrafica),label = "referencia",linestyle="-.")
+            plt.plot(puntosGrafica,np.sin(f*np.array(puntosGrafica)),label = "referencia",linestyle="-.")
             plt.plot(7,np.sin(7),marker = '|',ms= 10, label = 'Fin del dominio')
             plt.legend()
             plt.title(f"{i} epochs")
@@ -227,7 +227,7 @@ for ronda_solucion in range(1):
     tiempoInicial = time.time()
     i = 0
     termino = False
-    while  not termino and tiempoInicial+3600*2.4>time.time() :
+    while  not termino and tiempoInicial+3600*1>time.time() :
         # Compute prediction and loss
         loss = perdidaConPesos()
         # Backpropagation
